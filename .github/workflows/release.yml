@@ -1,0 +1,114 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+      - name: Delete release, if present
+        run: >-
+          gh release view "${GITHUB_REF/*\/tags\//}"
+          && gh release delete -y "${GITHUB_REF/*\/tags\//}"
+          || :
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          workdir: cmd/gsmaster/
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Create a container image for the Go binary and push it to the Github registry
+  build-and-push-image:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Login to gscr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create the container tags variable
+        id: container_tags
+        run: >-
+          printf "container_tags=${REGISTRY,,}:%s,${REGISTRY,,}:%s\n" "${GITHUB_REF/*\/tags\/v/}" "latest" >> "$GITHUB_OUTPUT";
+          printf "container_labels<<EOF\norg.opencontainers.image.version=%s\norg.opencontainers.image.created=%s\nEOF\n" "${GITHUB_REF/*\/tags\/v/}" "${{ github.event.head_commit.timestamp }}" >> "$GITHUB_OUTPUT";
+        env:
+          REGISTRY: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+
+      - name: Build and push the Container image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile
+          push: true
+          tags: ${{ steps.container_tags.outputs.container_tags }}
+          labels: ${{ steps.container_tags.outputs.container_labels }}
+
+      - name: Generate artifact attestation
+        if: ${{ ! github.event.repository.private }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
+      - name: Delete older container versions
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: ${{ github.event.repository.name }}
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'
+
+  cleanup-old-container-versions:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+
+      - name: Delete old container versions
+        uses: actions/delete-package-versions@v5
+        with: 
+          package-name: ${{ github.event.repository.name }}
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true' 

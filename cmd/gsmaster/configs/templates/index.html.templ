@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer"
+        />
+
+        <script>
+            window.onload = (event) => {
+                if (window.location.hash.replace("#", "") != "" && document.getElementById("ipport-" + window.location.hash.replace("#", ""))) {
+                    document.getElementById("ipport-" + window.location.hash.replace("#", "")).scrollIntoView();
+                    document.getElementById("ipport-" + window.location.hash.replace("#", "")).click();
+                }
+            }
+        </script> 
+        <style>
+            @media (min-width: 1400px) {
+            .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                max-width: 1320px;
+            }
+            }
+            body {
+                background-color: #343a40;
+            }
+            #serverslist.table {
+                background-color: rgba(69, 77, 85, 35%);
+            }
+            #serverslist.table > * > tr > td {
+                padding: 4px !important;
+            }
+            #serverslist.table > thead > tr > * {
+                font-size: 20px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(1),
+            #serverslist.table > tbody > tr.server > *:nth-child(1) {
+                width: 30px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(2),
+            #serverslist.table > tbody > tr.server > *:nth-child(2) {
+                min-width: auto;
+                max-width: 140px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(3),
+            #serverslist.table > tbody > tr.server > *:nth-child(3) {
+                width: 220px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(4),
+            #serverslist.table > tbody > tr.server > *:nth-child(4) {
+                width: 160px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(5),
+            #serverslist.table > tbody > tr.server > *:nth-child(5) {
+                width: 110px;
+            }
+            #serverslist.table > thead > tr > *:nth-child(6),
+            #serverslist.table > thead > tr > *:nth-child(7),
+            #serverslist.table > tbody > tr.server > *:nth-child(6),
+            #serverslist.table > tbody > tr.server > *:nth-child(7) {
+                width: 90px;
+            }
+            #serverslist.table > tbody > tr.server > *:nth-child(6) {
+                text-align: center;
+            }
+            table > thead > tr > *:nth-child(1) > .fa-lock,
+            #serverslist.table > tbody > tr.server > *:nth-child(1) > .fa-lock {
+                width: 100%;
+                font-size: 20px;
+                text-align: center;
+            }
+            table > tbody > tr.server:hover,
+            table > tbody > tr.server:hover + .server-details,
+            table > tbody > tr.server-details:hover,
+            table > tbody > tr.server:has(+ .server-details:hover) {
+                cursor: default;
+                background-color: rgba(69, 77, 85, 50%);
+            }
+            #serverslist.table > tbody > tr.server-details {
+                display: none;
+            }
+            #serverslist.table > tbody > tr.server-details img {
+                min-width: 480px;
+                min-height: 200px;
+                display: inline-block;
+            }
+            #serverslist.table > tbody > tr.server-details > td > dev {
+                width: 50%;
+                display: inline-block;
+                float: left;
+            }
+            table.playerlist > * > * > th,
+            table.playerlist > * > * > td {
+                padding: 8px 16px;
+                text-align: center;
+            }
+            table.playerlist > * > * > th:nth-child(1),
+            table.playerlist > * > * > td:nth-child(1) {
+                text-align: left;
+            }
+            .serversinfo,
+            .serversfilter {
+                margin: 10px 0;
+                user-select: none;
+            }
+            .serversinfo {
+                width: 75%;
+                float: left;
+            }
+            .serversinfo-header {
+                font-weight: bold;
+                text-transform: uppercase;
+                color: white;
+                margin: 10px 0;
+            }
+            .serversinfo-header > *:nth-child(1) {
+                color: rgb(240, 231, 206, 0.90);
+                font-size: 20px;
+                padding: 0;
+                margin: 0;
+                line-height: 20px;
+            }
+            .serversinfo-header > *:nth-child(2) {
+                color: rgb(240, 231, 206, 0.60);
+                padding: 0;
+                margin: 0;
+                font-size: 35px;
+                line-height: 30px;
+            }
+            .serversinfo-counter {
+                color: rgb(255, 255, 255, 0.80);
+                line-height: 30px;
+                font-size: 16px;
+            }
+            .serversfilter {
+                width: 25%;
+                float: right;
+            }
+            .serversfilter > .serversfilter-options {
+                margin: 10px 0;
+            }
+            .serversfilter > .serversfilter-gameversion label {
+                color: rgb(255, 255, 255, 0.60);
+                margin: 0;
+            }
+            .serversfilter > .serversfilter-gameversion .custom-select {
+                background-color: rgba(255, 255, 255, 0.05);
+                color: rgba(255, 255, 255, 0.7);
+                border-color: rgba(255, 255, 255, 0.25);
+            }
+            .serversfilter > .serversfilter-options label {
+                color: rgb(255, 255, 255, 0.60);
+                cursor: pointer;
+                margin: 0;
+            }
+            #filter-empty,
+            #filter-password {
+                display: none;
+            }
+            #filter-empty:checked + #filter-password + #serverslist .server.filter-isempty,
+            #filter-empty:checked + #filter-password + #serverslist .server.filter-isempty + .server-details {
+                display: none !important;
+            }
+            #filter-password:checked + #serverslist .server.filter-haspassword,
+            #filter-password:checked + #serverslist .server.filter-haspassword + .server-details {
+                display: none !important;
+            }
+            .serversfilter > .serversfilter-options label::before {
+                content: '\2713';
+                width: 20px;
+                font-size: 20px;
+                line-height: 20px;
+                font-weight: bold;
+                color: rgba(0, 255, 0, 0);
+            }
+            .container:has(#filter-empty:checked) *[for="filter-empty"]::before,
+            .container:has(#filter-password:checked) *[for="filter-password"]::before {
+                color: rgba(0, 255, 0, 0.90);
+            }
+            #serverslist.table > tbody > tr.server {
+                display: none;
+            }
+            .container:has(#filter-gameversion option:checked[value="all"]) #serverslist.table > tbody > tr.server,
+            .container:has(#filter-gameversion option:checked[value="cod1-1.1"]) #serverslist.table > tbody > tr.server.version-cod1-1_1,
+            .container:has(#filter-gameversion option:checked[value="cod1-1.2"]) #serverslist.table > tbody > tr.server.version-cod1-1_2,
+            .container:has(#filter-gameversion option:checked[value="cod1-1.3"]) #serverslist.table > tbody > tr.server.version-cod1-1_3,
+            .container:has(#filter-gameversion option:checked[value="cod1-1.4"]) #serverslist.table > tbody > tr.server.version-cod1-1_4,
+            .container:has(#filter-gameversion option:checked[value="cod1-1.5"]) #serverslist.table > tbody > tr.server.version-cod1-1_5,
+            .container:has(#filter-gameversion option:checked[value="coduo-1.41"]) #serverslist.table > tbody > tr.server.version-coduo-1_41,
+            .container:has(#filter-gameversion option:checked[value="coduo-1.51"]) #serverslist.table > tbody > tr.server.version-coduo-1_51,
+            .container:has(#filter-gameversion option:checked[value="cod2-1.0"]) #serverslist.table > tbody > tr.server.version-cod2-1_0,
+            .container:has(#filter-gameversion option:checked[value="cod2-1.2"]) #serverslist.table > tbody > tr.server.version-cod2-1_2,
+            .container:has(#filter-gameversion option:checked[value="cod2-1.3"]) #serverslist.table > tbody > tr.server.version-cod2-1_3,
+            .container:has(#filter-gameversion option:checked[value="cod2-1.4"]) #serverslist.table > tbody > tr.server.version-cod2-1_4,
+            .container:has(#filter-gameversion option:checked[value="cod4-1.0"]) #serverslist.table > tbody > tr.server.version-cod4-1_0,
+            .container:has(#filter-gameversion option:checked[value="cod4-1.7"]) #serverslist.table > tbody > tr.server.version-cod4-1_7,
+            .container:has(#filter-gameversion option:checked[value="cod4-1.8"]) #serverslist.table > tbody > tr.server.version-cod4-1_8 {
+                display: table-row;
+            }
+
+            #serverslist.table > tbody > tr.server td input {
+                display: none;
+            }
+            #serverslist.table > tbody > tr.server:has(input:checked) + .server-details {
+                display: table-row;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <div class="container">
+            <div class="serversheader">
+                <div class="serversinfo">
+                    <div class="serversinfo-header">
+                        <h>Call Of Duty MULTIPLAYER</h>
+                        <p>SERVER BROWSER</p>
+                    </div>
+                    <div class="serversinfo-counter">
+                        There are {{ .TotalPlayers }} players online on {{ .TotalGameservers }} servers.
+                    </div>
+                </div>
+                <div class="serversfilter">
+                    <div class="serversfilter-gameversion">
+                        <label for="filter-gameversion">Game and protocol:</label>
+                        <select class="custom-select" id="filter-gameversion">
+                            <option value="all">All</option>
+                            <option value="cod1-1.1">COD1-1.1</option>
+                            <option value="cod1-1.2">COD1-1.2</option>
+                            <option value="cod1-1.3">COD1-1.3</option>
+                            <option value="cod1-1.4">COD1-1.4</option>
+                            <option value="cod1-1.5">COD1-1.5</option>
+                            <option value="coduo-1.41">COD UO-1.41</option>
+                            <option value="coduo-1.51">COD UO-1.51</option>
+                            <option value="cod2-1.0">COD2-1.0</option>
+                            <option value="cod2-1.2">COD2-1.2</option>
+                            <option value="cod2-1.3">COD2-1.3</option>
+                            <option value="cod2-1.4">COD2-1.4</option>
+                            <option value="cod4-1.0">COD4-1.0</option>
+                            <option value="cod4-1.7">COD4-1.7</option>
+                            <option value="cod4-1.8">COD4-1.8</option>
+                        </select>
+                    </div>
+                    <div class="serversfilter-options">
+                        <div class="serversfilter-options">
+                            <label for="filter-empty">Hide empty servers</label>
+                            <label for="filter-password">Hide password servers</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="filter-empty">
+                <input type="checkbox" id="filter-password">
+                <table id="serverslist" class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th scope="col"><i class="fa-solid fa-lock"></i></th>
+                            <th scope="col">Server Name</th>
+                            <th scope="col">IP:Port</th>
+                            <th scope="col">Map</th>
+                            <th scope="col">Players</th>
+                            <th scope="col">Type</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range $_, $gsinfo := .Gameservers }}
+                        <tr class="server version-{{$gsinfo.version}}{{ if $gsinfo.passwordprotected }} filter-haspassword{{end}}{{ if eq $gsinfo.curclients 0 }} filter-isempty{{end}}" onclick="this.querySelector('input').checked = !this.querySelector('input').checked" id="ipport-{{$gsinfo.ipport}}">
+                            <td><input type="checkbox" id="details-{{$gsinfo.ipport}}">{{ if $gsinfo.passwordprotected }}<i class="fa-solid fa-lock"></i>{{end}}</td>
+                            <td class="text-truncate collapsed" title="{{$gsinfo.hostname}}">{{$gsinfo.hostname_colorized}}</td>
+                            <td class="text-truncate">{{$gsinfo.ipport}}</td>
+                            <td class="text-truncate" title="{{$gsinfo.map}}">{{$gsinfo.map}}</td>
+                            <td class="text-nowrap">{{$gsinfo.curclients}} / {{$gsinfo.maxclients}}</td>
+                            <td>{{$gsinfo.gametype}}</td>
+                            <td>{{$gsinfo.version}}</td>
+                        </tr>
+                        <tr class="server-details" onclick="this.previousElementSibling.querySelector('input').checked = !this.previousElementSibling.querySelector('input').checked">
+                            <td colspan="7">
+                                <dev>
+                                    <img class="rounded" title="{{$gsinfo.map}}" src="{{$gsinfo.map_preview}}" alt="{{$gsinfo.map}}">
+                                </dev>
+                                <dev>
+                                    <table class="playerlist table table-dark">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">Score</th>
+                                                <th scope="col">Ping</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{ range $_, $v := $gsinfo.players_colorized }}
+                                            <tr>
+                                                <td>{{ $v.Name }}</td>
+                                                <td>{{ $v.Score }}</td>
+                                                <td>{{ $v.Ping }}</td>
+                                            </tr>
+                                            {{ end }}
+                                        </tbody>
+                                    </table>
+                                </dev>
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
